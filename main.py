@@ -24,3 +24,9 @@ self.go_btn = setMinimumHeight(38)
 self.go_btn = QPushButton(">")
 self.go_btn = setMinimumHeight(38)
 
+self.horizontal.addWidget(self.url_bar)
+self.horizontal.addWidget(self.go_btn)
+self.horizontal.addWidget(self.back_btn)
+self.horizontal.addWidget(self.forward_btn)
+
+self.browser = QWebEngineView()

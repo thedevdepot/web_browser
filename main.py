@@ -1,13 +1,11 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWebEngineWidgets import *
 
 
 class MyWebBrowser():
 
-    def __init__(self, *args, **kwargs):
-        super(MyWebBrowser, self).__init__(*args, **kwargs)
+    def __init__(self):
 
         self.window = QWidget()
         self.window.setWindowTitle("Python Web Browser")
@@ -16,15 +14,16 @@ class MyWebBrowser():
         self.horizontal = QHBoxLayout()
 
         self.url_bar = QTextEdit()
-        self.go_btn = setMinimumHeight(38)
+        self.url_bar.setMaximumHeight(38)
 
-        self.go_btn = setMinimumHeight(38)
+        self.go_btn = QPushButton("Go")
+        self.go_btn.setMaximumHeight(38)
 
-        self.go_btn = QPushButton("<")
-        self.go_btn = setMinimumHeight(38)
+        self.back_btn = QPushButton("<")
+        self.back_btn.setMaximumHeight(38)
 
-        self.go_btn = QPushButton(">")
-        self.go_btn = setMinimumHeight(38)
+        self.forward_btn = QPushButton(">")
+        self.forward_btn.setMaximumHeight(38)
 
         self.horizontal.addWidget(self.url_bar)
         self.horizontal.addWidget(self.go_btn)
@@ -32,12 +31,26 @@ class MyWebBrowser():
         self.horizontal.addWidget(self.forward_btn)
 
         self.browser = QWebEngineView()
-        self.browser.setUrl(Qurl("http://google.com"))
+
+        self.go_btn.clicked.connect(lambda: self.navigate(self.url_bar.toPlainText()))
+        self.back_btn.clicked.connect(self.browser.back)
+        self.forward_btn.clicked.connect(self.browser.forward)
+
+        self.horizontal.addLayout(self.horizontal)
+        self.horizontal.addWidget(self.browser)
+
+        self.browser.setUrl(QUrl("http://google.com"))
 
         self.window.setLayout(self.layout)
         self.window.show()
 
-    app = QApplication([])
-    window = MyWebBrowser()
-    app.exec_()
+    def navigate(self, url):
+        if not url.startswith("http://"):
+            url = "http://" + url
+            self.url_bar.setText(url)
+        self.browser.setUrl(QUrl(url))
 
+
+app = QApplication([])
+window = MyWebBrowser()
+app.exec_()

@@ -1,56 +1,43 @@
-from PyQt5.QtWidgets import *
+import sys
 from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
-
-class MyWebBrowser():
-
+class MainWindow(QMainWindow):
     def __init__(self):
-
-        self.window = QWidget()
-        self.window.setWindowTitle("Python Web Browser")
-
-        self.layout = QVBoxLayout()
-        self.horizontal = QHBoxLayout()
-
-        self.url_bar = QTextEdit()
-        self.url_bar.setMaximumHeight(38)
-
-        self.go_btn = QPushButton("Go")
-        self.go_btn.setMaximumHeight(38)
-
-        self.back_btn = QPushButton("<")
-        self.back_btn.setMaximumHeight(38)
-
-        self.forward_btn = QPushButton(">")
-        self.forward_btn.setMaximumHeight(38)
-
-        self.horizontal.addWidget(self.url_bar)
-        self.horizontal.addWidget(self.go_btn)
-        self.horizontal.addWidget(self.back_btn)
-        self.horizontal.addWidget(self.forward_btn)
-
+        super(MainWindow, self).__init__()
         self.browser = QWebEngineView()
+        self.browser.setUrl(QUrl('http://google.com'))
 
-        self.go_btn.clicked.connect(lambda: self.navigate(self.url_bar.toPlainText()))
-        self.back_btn.clicked.connect(self.browser.back)
-        self.forward_btn.clicked.connect(self.browser.forward)
+        navbar = QToolBar()
+        self.addToolBar(navbar)
 
-        self.horizontal.addLayout(self.horizontal)
-        self.horizontal.addWidget(self.browser)
+        back_btn = QAction('Back', self)
+        back_btn.triggered.connect(self.browser.back)
+        navbar.addAction(back_btn)
 
-        self.browser.setUrl(QUrl("http://google.com"))
+        forward_btn = QAction('Forward', self)
+        forward_btn.triggered.connect(self.browser.forward)
+        navbar.addAction(forward_btn)
 
-        self.window.setLayout(self.layout)
-        self.window.show()
+        self.url_bar = QLineEdit()
+        self.url_bar.returnPressed.connect(self.navigate_to_url)
+        navbar.addWidget(self.url_bar)
+        self.browser.urlChanged.connect(self.update_url)
 
-    def navigate(self, url):
-        if not url.startswith("http://"):
+        self.setCentralWidget(self.browser)
+        self.show()
+
+    def navigate_to_url(self):
+        url = self.url_bar.text()
+        if not url.startswith("http://") and not url.startswith("https://"):
             url = "http://" + url
-            self.url_bar.setText(url)
         self.browser.setUrl(QUrl(url))
 
+    def update_url(self, q):
+        self.url_bar.setText(q.toString())
 
-app = QApplication([])
-window = MyWebBrowser()
-app.exec_()
+app = QApplication(sys.argv)
+QApplication.setApplicationName('Web Browser')
+window = MainWindow()
+sys.exit(app.exec_())
